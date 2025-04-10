@@ -5,32 +5,32 @@ from flask_pydantic_spec import FlaskPydanticSpec
 from models import *
 
 app = Flask(__name__)
-spec = FlaskPydanticSpec(app)
+spec = FlaskPydanticSpec('flask', title='API + Biblioteca + Banco', version='1.0.0')
 
 
-@app.route('/cadastrar_livro', methods=['GET', 'POST'])
+@app.route('/cadastrar/livro', methods=['GET', 'POST'])
 def cadastrar_livro():
     """
-       API para cadastrar livro.
+        API para cadastrar livro.
 
-       ## Endpoint:
-        /cadastrar_livro
+        ## Endpoint:
+            /cadastrar/livro
 
-       ## Respostas (JSON):
-       ```json
+        ## Respostas (JSON):
+        ```json
 
-       {
+        {
             "titulo":
             "autor",
             "isbn":,
             "resumo",
         }
 
-       ## Erros possíveis (JSON):
+        ## Erros possíveis (JSON):
         "O livro já está cadastrado", rertorna erro ***400
         Bad Request***:
             ```json
-       """
+        """
 
     try:
         if request.method == 'POST':
@@ -81,29 +81,30 @@ def cadastrar_livro():
         })
 
 
-@app.route('/cadastrar_usuario', methods=['POST', 'GET'])
+@app.route('/cadastrar/usuario', methods=['POST'])
 def cadastrar_usuario():
     """
-           API para cadastrar usuário.
+        API para cadastrar usuário.
 
-           ## Endpoint:
-            /cadastrar_usuario
+        ## Endpoint:
+            /cadastrar/usuario
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+            ```json
 
-           {
+            {
+                "mensagem": usuario cadastrado com sucesso!,
                 "id":
                 "nome",
                 "cpf":,
                 "endereco",
             }
 
-           ## Erros possíveis (JSON):
+        ## Erros possíveis (JSON):
             "O usuário já está cadastrado", rertorna erro ***400
             Bad Request***:
                 ```json
-           """
+        """
 
     try:
         if request.method == 'POST':
@@ -135,6 +136,7 @@ def cadastrar_usuario():
                 # db_session.close()
 
                 return jsonify({
+                    "mensagem": "Usuário cadastrado com sucesso!",
                     "id": form_criar.id,
                     "nome": form_criar.nome,
                     "cpf": form_criar.cpf,
@@ -147,29 +149,29 @@ def cadastrar_usuario():
         }), 404
 
 
-@app.route('/cadastrar_emprestimo', methods=['POST', 'GET'])
+@app.route('/cadastrar/emprestimo', methods=['POST'])
 def cadastrar_emprestimo():
     """
-           API para cadastrar emprestimo.
+        API para cadastrar emprestimo.
 
-           ## Endpoint:
-            /cadastrar_emprestimo
+        ## Endpoint:
+            /cadastrar/emprestimo
 
-           ## Respostas (JSON):
-           ```json
+    ## Respostas (JSON):
+    ```json
 
-           {
-                "data_devolucao":
-                "data_emprestimo",
-                "livro":,
-                "usuario":,
-            }
+        {
+            "data_devolucao":
+            "data_emprestimo",
+            "livro":,
+            "usuario":,
+        }
 
-           ## Erros possíveis (JSON):
-            "Emprestimo já cadastrado", rertorna erro ***400
-            Bad Request***:
-                ```json
-           """
+        ## Erros possíveis (JSON):
+        "Emprestimo já cadastrado", rertorna erro ***400
+        Bad Request***:
+        ```json
+    """
 
     try:
         if request.method == 'POST':
@@ -208,32 +210,32 @@ def cadastrar_emprestimo():
         })
 
 
-@app.route('/editar_livro/<int:id>', methods=['POST'])
+@app.route('/editar/livro:<int:id>', methods=['POST'])
 def editar_livro(id):
     """
-           API para editar informações do livro.
+        API para editar informações do livro.
 
-           ## Endpoint:
-            /editar_livro/<int:id>
+        ## Endpoint:
+        /editar/livro/<int:id>
 
-            ## Parâmetro:
-            "id" **Id do livro**
+        ## Parâmetro:
+        "id" **Id do livro**
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+        ```json
 
-           {
+        {
                 "titulo":
                 "autor",
                 "isbn":,
                 "resumo",
             }
 
-           ## Erros possíveis (JSON):
+        ## Erros possíveis (JSON):
             "O titulo deste livro já está cadastrado", rertorna erro ***400
             Bad Request***:
                 ```json
-           """
+        """
 
     try:
         livro_atualizado = db_session.execute(select(Livro).where(Livro.id == id)).scalar()
@@ -272,31 +274,31 @@ def editar_livro(id):
         })
 
 
-@app.route('/editar_usuario/<int:id>', methods=['GET', 'POST'])
+@app.route('/editar/usuario/<int:id>', methods=['PUT'])
 def editar_usuario(id):
     """
-           API para editar dados do usuario.
+        API para editar dados do usuario.
 
-           ## Endpoint:
-            /editar_usuario/<int:id>
+        ## Endpoint:
+            /editar/usuario/<int:id>
 
             ##Parâmetros:
             "id" **Id do usuario**
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+        ```json
 
-           {
+        {
                 "nome":
                 "cpf",
                 "endereco":,
             }
 
-           ## Erros possíveis (JSON):
+        ## Erros possíveis (JSON):
             "O CPF deste usuário já está cadastrado", rertorna erro ***400
             Bad Request***:
                 ```json
-           """
+        """
 
     try:
         usuario_atualizado = db_session.execute(select(Usuario).where(Usuario.id == id)).scalar()
@@ -342,13 +344,13 @@ def editar_usuario(id):
         })
 
 
-@app.route('/get_usuario/<int:id>', methods=['GET'])
+@app.route('/get/usuario/<int:id>', methods=['PUT'])
 def get_usuario(id):
     """
            API para buscar um usuário.
 
            ## Endpoint:
-            /get_usuario/<int:id>
+            /get/usuario/<int:id>
 
             ##Parâmetros:
             "id" **Id do usuario**
@@ -392,15 +394,15 @@ def get_usuario(id):
 @app.route('/usuarios', methods=['GET'])
 def usuarios():
     """
-           API para listar usuários.
+        API para listar usuários.
 
-           ## Endpoint:
+        ## Endpoint:
             /usuarios
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+        ```json
 
-           {
+        {
                 "usuarios": lista_usuarios
             }
 
@@ -424,13 +426,13 @@ def usuarios():
 @app.route('/livros', methods=['GET'])
 def livros():
     """
-           API listar livros.
+        API listar livros.
 
-           ## Endpoint:
+        ## Endpoint:
             /livros
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+        ```json
 
         {
             "livros": lista_livros"
@@ -440,7 +442,7 @@ def livros():
         "Não foi possível listar os livros ***400
         Bad Request***:
             ```json
-           """
+        """
 
     try:
         sql_livros = select(Livro)
@@ -456,19 +458,20 @@ def livros():
             "error": "Não foi possível listar os livros"
         })
 
-@app.route('/get_livro/<int:id>', methods=['GET'])
+
+@app.route('/get/livro:<int:id>', methods=['GET'])
 def get_livro(id):
     """
-           API para verificar um livro.
+        API para verificar um livro.
 
-           ## Endpoint:
-            /get_livro/<int:id>
+        ## Endpoint:
+            /get/livro/<int:id>
 
             ##Parâmetros:
             "id" **Id do livro**
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+        ```json
 
         {
             "id":,
@@ -482,8 +485,7 @@ def get_livro(id):
             "Não foi possível listar os dados do livro ***400
             Bad Request***:
                 ```json
-           """
-
+        """
 
     try:
         livro = db_session.execute(select(Livro).where(Livro.id == id)).scalar()
@@ -506,19 +508,21 @@ def get_livro(id):
         return jsonify({
             "error": "Não foi possívl listar os dados do livro"
         })
-@app.route('/emprestimos_usuario/<id>', methods=['GET'])
+
+
+@app.route('/emprestimos/usuario:<id>', methods=['GET'])
 def emprestimos_usuario(id):
     """
-           API para listar emprestimos por usuários.
+        API para listar emprestimos por usuários.
 
-           ## Endpoint:
+        ## Endpoint:
             /emprestimos_usuario/<int:id>
 
             ##Parâmetros:
             "id" **Id do usuário**
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+            ```json
 
             {
                 "usuario":
@@ -529,12 +533,13 @@ def emprestimos_usuario(id):
             ## Erros possíveis (JSON):
             "Não foi possível listar os dados deste emprestimo ***400
             Bad Request***:
-                ```json
-           """
+            ```json
+        """
 
     try:
         id_usuario = int(id)
-        emprestimos_user = db_session.execute(select(Emprestimo).where(Emprestimo.usuario_id == id_usuario)).scalars().all()
+        emprestimos_user = db_session.execute(
+            select(Emprestimo).where(Emprestimo.usuario_id == id_usuario)).scalars().all()
 
         if not emprestimos_user:
             return jsonify({
@@ -555,18 +560,20 @@ def emprestimos_usuario(id):
         return jsonify({
             "error": "Não foi possível listar os dados do emprestimo"
         })
-@app.route('/status_livro', methods=['GET'])
+
+
+@app.route('/status/livro', methods=['GET'])
 def status_livro():
     """
-           API para mostrar status de livro.
+            API para mostrar status de livro.
 
-           ## Endpoint:
+            ## Endpoint:
             /status_livro
 
-           ## Respostas (JSON):
-           ```json
+        ## Respostas (JSON):
+        ```json
 
-           {
+        {
                 "livros emprestados":
                 "livros disponiveis",
             }
@@ -577,13 +584,12 @@ def status_livro():
                 ```json
             """
 
-
     try:
         livro_emprestado = db_session.execute(
             select(Livro).where(Livro.id == Emprestimo.livro_id).distinct(Livro.isbn)).scalars()
         id_livro_emprestado = db_session.execute(
             select(Livro.id).where(Livro.id == Emprestimo.livro_id).distinct(Livro.isbn)).scalars()
-        print("livro Emprestado",livro_emprestado)
+        print("livro Emprestado", livro_emprestado)
         livros = db_session.execute(select(Livro)).scalars()
 
         print("Livros todos", livros)
@@ -599,7 +605,6 @@ def status_livro():
 
         print("resultados lista", lista_emprestados)
         print("resultados disponibiliza", lista_disponiveis)
-
 
         return jsonify({
             "livros emprestados": lista_emprestados,

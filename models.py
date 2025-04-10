@@ -2,14 +2,14 @@ from sqlalchemy import create_engine, Integer,Column, String, ForeignKey, Float,
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship, declarative_base
 
 
-engine = create_engine('sqlite:///banco_api.sqlite3')
+engine = create_engine('sqlite:///banco_api_biblioteca.sqlite3')
 db_session = scoped_session(sessionmaker(bind=engine))
 
 Base = declarative_base()
 Base.query = db_session.query_property()
 
 class Livro(Base):
-    __tablename__ = 'Livros'
+    __tablename__ = 'TAB_BOOK'
     id = Column(Integer, primary_key=True)
     titulo = Column(String, nullable=False, index=True, unique=True)
     autor = Column(String, nullable=False, index=True)
@@ -39,7 +39,7 @@ class Livro(Base):
         return dados_livro
 
 class Usuario(Base):
-    __tablename__ = 'Usuarios'
+    __tablename__ = 'TAB_USER'
     id = Column(Integer, primary_key=True)
     nome = Column(String, nullable=False, index=True)
     cpf = Column(String, nullable=False, index=True, unique=True)
@@ -66,16 +66,16 @@ class Usuario(Base):
         return dados_usuario
 
 class Emprestimo(Base):
-    __tablename__ = 'Emprestimos'
+    __tablename__ = 'TAB_EMPRESTIMO'
     id = Column(Integer, primary_key=True)
     data_emprestimo = Column(String, nullable=False, index=True)
     data_devolucao_prevista = Column(String, nullable=False, index=True)
 
-    livro_id = Column(Integer, ForeignKey('Livros.id'))
-    livros = relationship('Livro')
+    livro_id = Column(Integer, ForeignKey('TAB_BOOK.id'))
+    livros = relationship(Livro)
 
-    usuario_id = Column(Integer, ForeignKey('Usuarios.id'))
-    usuarios = relationship('Usuario')
+    usuario_id = Column(Integer, ForeignKey('TAB_USER.id'))
+    usuarios = relationship(Usuario)
 
     def __repr__(self):
         return '<Emprestimo {}>'.format(self.data_emprestimo)
