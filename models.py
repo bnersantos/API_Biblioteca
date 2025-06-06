@@ -1,12 +1,13 @@
-from sqlalchemy import create_engine, Integer,Column, String, ForeignKey, Float, Column
+from sqlalchemy import create_engine, Integer, Column, String, ForeignKey, Float, Column, Boolean
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship, declarative_base
 
 
+
 engine = create_engine('sqlite:///banco_api_biblioteca.sqlite3')
-db_session = scoped_session(sessionmaker(bind=engine))
+local_session = sessionmaker(bind=engine)
 
 Base = declarative_base()
-Base.query = db_session.query_property()
+#Base.query = db_session.query_property()
 
 class Livro(Base):
     __tablename__ = 'TAB_BOOK'
@@ -15,19 +16,21 @@ class Livro(Base):
     autor = Column(String, nullable=False, index=True)
     isbn = Column(String, nullable=False, index=True, unique=True)
     resumo = Column(String, nullable=False, index=True)
+    status_livro = Column(Boolean, index=True, default=True)
+
 
     def __repr__(self):
         return '<Livro {}>'.format(self.titulo)
 
-    def save(self):
+    def save(self, db_session):
         db_session.add(self)
         db_session.commit()
 
-    def delete(self):
+    def delete(self, db_session):
         db_session.delete(self)
         db_session.commit()
 
-    def serialize_user(self):
+    def serialize_livro(self):
         dados_livro = {
             'id': self.id,
             'titulo': self.titulo,
@@ -44,15 +47,16 @@ class Usuario(Base):
     nome = Column(String, nullable=False, index=True)
     cpf = Column(String, nullable=False, index=True, unique=True)
     endereco = Column(String, nullable=False, index=True)
+    status_user = Column(Boolean, index=True, default=True)
 
     def __repr__(self):
         return '<Usuario {}>'.format(self.nome)
 
-    def save(self):
+    def save(self, db_session):
         db_session.add(self)
         db_session.commit()
 
-    def delete_user(self):
+    def delete_user(self, db_session):
         db_session.delete(self)
         db_session.commit()
 
@@ -62,6 +66,7 @@ class Usuario(Base):
             'nome': self.nome,
             'cpf': self.cpf,
             'endereco': self.endereco,
+            'status_user': self.status_user,
         }
         return dados_usuario
 
@@ -70,6 +75,7 @@ class Emprestimo(Base):
     id = Column(Integer, primary_key=True)
     data_emprestimo = Column(String, nullable=False, index=True)
     data_devolucao_prevista = Column(String, nullable=False, index=True)
+    status = Column(Boolean, nullable=False, index=True, default=False)
 
     livro_id = Column(Integer, ForeignKey('TAB_BOOK.id'))
     livros = relationship(Livro)
@@ -80,21 +86,22 @@ class Emprestimo(Base):
     def __repr__(self):
         return '<Emprestimo {}>'.format(self.data_emprestimo)
 
-    def save(self):
+    def save(self, db_session):
         db_session.add(self)
         db_session.commit()
 
-    def delete(self):
+    def delete(self, db_session):
         db_session.delete(self)
         db_session.commit()
 
-    def serialize_user(self):
+    def serialize_emprestimo(self):
         dados_emprestimo = {
             'id': self.id,
             'data_emprestimo': self.data_emprestimo,
             'data_devolucao': self.data_devolucao_prevista,
             'livro_id': self.livro_id,
             'usuario_id': self.usuario_id,
+            'status': self.status,
         }
 
         return dados_emprestimo
