@@ -1,5 +1,7 @@
-from sqlalchemy import create_engine, Integer, Column, String, ForeignKey, Float, Column, Boolean
+
+from sqlalchemy import create_engine, Integer, Column, String, ForeignKey, Float, Column, Boolean, Date
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship, declarative_base
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 
@@ -37,6 +39,7 @@ class Livro(Base):
             'autor': self.autor,
             'isbn': self.isbn,
             'resumo': self.resumo,
+            'status_livro': self.status_livro,
 
         }
         return dados_livro
@@ -66,16 +69,16 @@ class Usuario(Base):
             'nome': self.nome,
             'cpf': self.cpf,
             'endereco': self.endereco,
-            'status_user': self.status_user,
+            'status': self.status_user,
         }
         return dados_usuario
 
 class Emprestimo(Base):
     __tablename__ = 'TAB_EMPRESTIMO'
     id = Column(Integer, primary_key=True)
-    data_emprestimo = Column(String, nullable=False, index=True)
-    data_devolucao_prevista = Column(String, nullable=False, index=True)
-    status = Column(Boolean, nullable=False, index=True, default=False)
+    data_emprestimo = Column(Date, nullable=False, index=True)
+    data_devolucao_prevista = Column(Date, nullable=False, index=True)
+    status_emprestimo = Column(Boolean, index=True, default=True)
 
     livro_id = Column(Integer, ForeignKey('TAB_BOOK.id'))
     livros = relationship(Livro)
@@ -101,13 +104,48 @@ class Emprestimo(Base):
             'data_devolucao': self.data_devolucao_prevista,
             'livro_id': self.livro_id,
             'usuario_id': self.usuario_id,
-            'status': self.status,
+            'status_emprestimo': self.status_emprestimo,
         }
 
         return dados_emprestimo
+
+class USER(Base):
+    __tablename__ = 'TAB_IS_ADMIN'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, index=True)
+    cpf = Column(String(11), nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    admin = Column(Boolean, default=True)
+
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def __repr__(self):
+        return f'<Usuario(id={self.id}, nome={self.name}, cpf={self.cpf}, é admin={self.admin})>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nome": self.name,
+            "cpf": self.cpf,
+            "papel": "admin" if self.admin else "usuario",
+        }
+
+    def save(self, db_session):
+        db_session.add(self)
+        db_session.commit()
+
+    def delete(self, db_session):
+        db_session.delete(self)
+        db_session.commit()
 
 def init_db():
     Base.metadata.create_all(engine)
 
 if __name__ == '__main__':
     init_db()
+
